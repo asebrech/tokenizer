@@ -213,4 +213,76 @@ task("multisig:balance", "Check token balance")
     console.log("Balance:", hre.ethers.utils.formatEther(balance), symbol);
   });
 
+task("multisig:confirm-as", "Confirm a transaction using a specific private key")
+  .addParam("txid", "The transaction ID to confirm")
+  .addParam("key", "The private key of the owner (without 0x prefix)")
+  .setAction(async (taskArgs, hre) => {
+    const contractAddress = process.env.CONTRACT_ADDRESS;
+    if (!contractAddress) {
+      console.error("Please set CONTRACT_ADDRESS in your .env file");
+      return;
+    }
+
+    // Create a signer from the provided private key
+    const privateKey = taskArgs.key.startsWith('0x') ? taskArgs.key : `0x${taskArgs.key}`;
+    const provider = new hre.ethers.providers.JsonRpcProvider(process.env.API_URL);
+    const signer = new hre.ethers.Wallet(privateKey, provider);
+
+    console.log("\n--- Confirming Transaction ---");
+    console.log("Using account:", signer.address);
+    console.log("Transaction ID:", taskArgs.txid);
+
+    const Token = await hre.ethers.getContractFactory("GoofyGoober", signer);
+    const token = Token.attach(contractAddress);
+
+    // Check transaction status first
+    const txDetails = await token.getTransaction(taskArgs.txid);
+    
+    if (txDetails.executed) {
+      console.log("❌ Transaction has already been executed");
+      console.log("Recipient:", txDetails.to);
+      console.log("Amount:", hre.ethers.utils.formatEther(txDetails.amount), "tokens");
+      return;
+    }
+
+    // Check if already confirmed by this signer
+    const alreadyConfirmed = await token.isConfirmed(taskArgs.txid, signer.address);
+    
+    if (alreadyConfirmed) {
+      console.log("❌ This owner has already confirmed this transaction");
+      console.log("Current confirmations:", txDetails.confirmationCount.toString());
+      const requiredSigs = await token.requiredSignatures();
+      console.log("Required:", requiredSigs.toString());
+      return;
+    }
+
+    // Check if the signer is actually an owner
+    const isOwner = await token.isOwner(signer.address);
+    if (!isOwner) {
+      console.log("❌ This address is not an owner of the multisig");
+      console.log("Use 'npx hardhat multisig:owners --network sepolia' to see valid owners");
+      return;
+    }
+
+    const tx = await token.confirmTransaction(taskArgs.txid);
+    const receipt = await tx.wait();
+
+    console.log("✓ Transaction confirmed by", signer.address);
+    console.log("Gas used:", receipt.gasUsed.toString());
+
+    const executedEvent = receipt.events?.find(
+      (e) => e.event === "TransactionExecuted"
+    );
+    if (executedEvent) {
+      console.log("✓ Transaction executed successfully!");
+      console.log("🎉 Tokens have been minted!");
+    } else {
+      const updatedTxDetails = await token.getTransaction(taskArgs.txid);
+      console.log("⏳ Still needs more signatures");
+      console.log("Confirmations:", updatedTxDetails.confirmationCount.toString());
+      const requiredSigs = await token.requiredSignatures();
+      console.log("Required:", requiredSigs.toString());
+    }
+  });
+
 module.exports = {};
