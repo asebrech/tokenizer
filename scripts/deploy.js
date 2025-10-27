@@ -7,17 +7,14 @@ async function main() {
 
   console.log("Account balance:", await ethers.utils.formatEther(weiAmount));
 
-  // Define multisig owners (add more addresses as needed)
+  // Define multisig owners
   const owners = [
     deployer.address, // First owner (deployer)
     "0x76FB103D48D7e2719FE2D4470337120498233218",
-    // Add more owner addresses here:
-    // "0x1234567890123456789012345678901234567890",
-    // "0xABCDEF1234567890ABCDEF1234567890ABCDEF12",
   ];
 
   // Number of signatures required to execute a transaction
-  const requiredSignatures = 2; // Change this to require more signatures (e.g., 2 out of 3)
+  const requiredSignatures = 2;
 
   console.log("\nMultisig Configuration:");
   console.log("Owners:", owners);
@@ -29,13 +26,26 @@ async function main() {
 
   await token.deployed();
 
-  console.log("\nToken deployed to:", token.address);
-  console.log("\nTo mint tokens, owners must:");
-  console.log("1. Call submitMintTransaction(recipientAddress, amount)");
+  console.log("\n✅ Token deployed to:", token.address);
+  console.log("\n📝 Update the .env file:");
+  console.log(`CONTRACT_ADDRESS = "${token.address}"`);
+
+  console.log("\n🔐 How to mint tokens with multisig:");
+  console.log("1. Submit a mint transaction:");
   console.log(
-    "2. Other owners call confirmTransaction(txId) until required signatures are met"
+    "   npx hardhat multisig:submit --to <address> --amount <amount> --network sepolia"
   );
-  console.log("3. Transaction will auto-execute when threshold is reached");
+  console.log("\n2. Other owners confirm:");
+  console.log("   npx hardhat multisig:confirm --txid <id> --network sepolia");
+  console.log("   OR with specific key:");
+  console.log(
+    "   npx hardhat multisig:confirm-as --txid <id> --key <private_key> --network sepolia"
+  );
+  console.log("\n3. Transaction auto-executes when threshold is reached!");
+
+  console.log("\n📊 View contract info:");
+  console.log("   npx hardhat multisig:info --network sepolia");
+  console.log("   npx hardhat multisig:owners --network sepolia");
 }
 
 main()
