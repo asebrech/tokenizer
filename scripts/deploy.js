@@ -9,12 +9,11 @@ async function main() {
 
   // Define multisig owners
   const owners = [
-    deployer.address, // First owner (deployer)
+    deployer.address,
     "0x76FB103D48D7e2719FE2D4470337120498233218",
   ];
 
-  // Number of signatures required to execute a transaction
-  const requiredSignatures = 2;
+  const requiredSignatures = owners.length;
 
   console.log("\nMultisig Configuration:");
   console.log("Owners:", owners);
