@@ -3,9 +3,9 @@ async function main() {
 
   console.log("Deploying contracts with the account:", deployer.address);
 
-  const weiAmount = (await deployer.getBalance()).toString();
+  const balance = await ethers.provider.getBalance(deployer.address);
 
-  console.log("Account balance:", await ethers.utils.formatEther(weiAmount));
+  console.log("Account balance:", ethers.formatEther(balance));
 
   // Define multisig owners
   const owners = [
@@ -24,11 +24,13 @@ async function main() {
   const Token = await ethers.getContractFactory("GoofyGoober");
   const token = await Token.deploy(owners, requiredSignatures);
 
-  await token.deployed();
+  await token.waitForDeployment();
 
-  console.log("\n✅ Token deployed to:", token.address);
-  console.log("\n📝 Update the .env file:");
-  console.log(`CONTRACT_ADDRESS = "${token.address}"`);
+  const tokenAddress = await token.getAddress();
+
+  console.log("\n✅ Token deployed to:", tokenAddress);
+  console.log("\n📝 Update your .env file:");
+  console.log(`CONTRACT_ADDRESS = "${tokenAddress}"`);
 
   console.log("\n🔐 How to mint tokens with multisig:");
   console.log("1. Submit a mint transaction:");

@@ -22,7 +22,7 @@ task("multisig:info", "Display multisig contract information").setAction(
     console.log("Symbol:", symbol);
     console.log(
       "Total Supply:",
-      hre.ethers.utils.formatEther(totalSupply),
+      hre.ethers.formatEther(totalSupply),
       symbol
     );
     console.log("Required Signatures:", requiredSigs.toString());
@@ -75,14 +75,20 @@ task("multisig:submit", "Submit a new mint transaction")
     console.log("Recipient:", taskArgs.to);
     console.log("Amount:", taskArgs.amount, "tokens");
 
-    const amountWei = hre.ethers.utils.parseEther(taskArgs.amount);
+    const amountWei = hre.ethers.parseEther(taskArgs.amount);
     const tx = await token.submitMintTransaction(taskArgs.to, amountWei);
     const receipt = await tx.wait();
 
-    const event = receipt.events?.find(
-      (e) => e.event === "TransactionSubmitted"
-    );
-    const txId = event?.args?.txId;
+    const txId = receipt.logs
+      .map(log => {
+        try {
+          return token.interface.parseLog(log);
+        } catch (e) {
+          return null;
+        }
+      })
+      .find(event => event && event.name === "TransactionSubmitted")
+      ?.args?.txId;
 
     console.log("✓ Transaction submitted!");
     console.log("Transaction ID:", txId.toString());
@@ -122,7 +128,7 @@ task("multisig:confirm", "Confirm a pending transaction")
     if (txDetails.executed) {
       console.log("❌ Transaction has already been executed");
       console.log("Recipient:", txDetails.to);
-      console.log("Amount:", hre.ethers.utils.formatEther(txDetails.amount), "tokens");
+      console.log("Amount:", hre.ethers.formatEther(txDetails.amount), "tokens");
       return;
     }
 
@@ -144,9 +150,16 @@ task("multisig:confirm", "Confirm a pending transaction")
     console.log("✓ Transaction confirmed!");
     console.log("Gas used:", receipt.gasUsed.toString());
 
-    const executedEvent = receipt.events?.find(
-      (e) => e.event === "TransactionExecuted"
-    );
+    const executedEvent = receipt.logs
+      .map(log => {
+        try {
+          return token.interface.parseLog(log);
+        } catch (e) {
+          return null;
+        }
+      })
+      .find(event => event && event.name === "TransactionExecuted");
+    
     if (executedEvent) {
       console.log("✓ Transaction executed successfully!");
     } else {
@@ -176,7 +189,7 @@ task("multisig:tx", "View transaction details")
 
     console.log("Transaction ID:", taskArgs.txid);
     console.log("Recipient:", tx.to);
-    console.log("Amount:", hre.ethers.utils.formatEther(tx.amount), "tokens");
+    console.log("Amount:", hre.ethers.formatEther(tx.amount), "tokens");
     console.log("Executed:", tx.executed);
     console.log(
       "Confirmations:",
@@ -210,7 +223,7 @@ task("multisig:balance", "Check token balance")
     const balance = await token.balanceOf(address);
     const symbol = await token.symbol();
 
-    console.log("Balance:", hre.ethers.utils.formatEther(balance), symbol);
+    console.log("Balance:", hre.ethers.formatEther(balance), symbol);
   });
 
 task("multisig:confirm-as", "Confirm a transaction using a specific private key")
@@ -225,7 +238,7 @@ task("multisig:confirm-as", "Confirm a transaction using a specific private key"
 
     // Create a signer from the provided private key
     const privateKey = taskArgs.key.startsWith('0x') ? taskArgs.key : `0x${taskArgs.key}`;
-    const provider = new hre.ethers.providers.JsonRpcProvider(process.env.API_URL);
+    const provider = new hre.ethers.JsonRpcProvider(process.env.API_URL);
     const signer = new hre.ethers.Wallet(privateKey, provider);
 
     console.log("\n--- Confirming Transaction ---");
@@ -241,7 +254,7 @@ task("multisig:confirm-as", "Confirm a transaction using a specific private key"
     if (txDetails.executed) {
       console.log("❌ Transaction has already been executed");
       console.log("Recipient:", txDetails.to);
-      console.log("Amount:", hre.ethers.utils.formatEther(txDetails.amount), "tokens");
+      console.log("Amount:", hre.ethers.formatEther(txDetails.amount), "tokens");
       return;
     }
 
@@ -270,9 +283,16 @@ task("multisig:confirm-as", "Confirm a transaction using a specific private key"
     console.log("✓ Transaction confirmed by", signer.address);
     console.log("Gas used:", receipt.gasUsed.toString());
 
-    const executedEvent = receipt.events?.find(
-      (e) => e.event === "TransactionExecuted"
-    );
+    const executedEvent = receipt.logs
+      .map(log => {
+        try {
+          return token.interface.parseLog(log);
+        } catch (e) {
+          return null;
+        }
+      })
+      .find(event => event && event.name === "TransactionExecuted");
+    
     if (executedEvent) {
       console.log("✓ Transaction executed successfully!");
       console.log("🎉 Tokens have been minted!");
