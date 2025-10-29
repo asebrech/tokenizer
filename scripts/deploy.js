@@ -20,7 +20,7 @@ async function main() {
   console.log("Required signatures:", requiredSignatures);
 
   // Deploy the contract with multisig parameters
-  const Token = await ethers.getContractFactory("GoofyGoober");
+  const Token = await ethers.getContractFactory("DontPanic42");
   const token = await Token.deploy(owners, requiredSignatures);
 
   await token.waitForDeployment();

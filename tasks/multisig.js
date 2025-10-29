@@ -8,7 +8,7 @@ task("multisig:info", "Display multisig contract information").setAction(
       return;
     }
 
-    const Token = await hre.ethers.getContractFactory("GoofyGoober");
+    const Token = await hre.ethers.getContractFactory("DontPanic42");
     const token = Token.attach(contractAddress);
 
     console.log("\n--- Contract Information ---");
@@ -38,7 +38,7 @@ task("multisig:owners", "List all multisig owners").setAction(
       return;
     }
 
-    const Token = await hre.ethers.getContractFactory("GoofyGoober");
+    const Token = await hre.ethers.getContractFactory("DontPanic42");
     const token = Token.attach(contractAddress);
 
     console.log("\n--- Multisig Owners ---");
@@ -68,7 +68,7 @@ task("multisig:submit", "Submit a new mint transaction")
       return;
     }
 
-    const Token = await hre.ethers.getContractFactory("GoofyGoober");
+    const Token = await hre.ethers.getContractFactory("DontPanic42");
     const token = Token.attach(contractAddress);
 
     console.log("\n--- Submitting Mint Transaction ---");
@@ -116,7 +116,7 @@ task("multisig:confirm", "Confirm a pending transaction")
       return;
     }
 
-    const Token = await hre.ethers.getContractFactory("GoofyGoober");
+    const Token = await hre.ethers.getContractFactory("DontPanic42");
     const token = Token.attach(contractAddress);
 
     console.log("\n--- Confirming Transaction ---");
@@ -180,7 +180,7 @@ task("multisig:tx", "View transaction details")
       return;
     }
 
-    const Token = await hre.ethers.getContractFactory("GoofyGoober");
+    const Token = await hre.ethers.getContractFactory("DontPanic42");
     const token = Token.attach(contractAddress);
 
     console.log("\n--- Transaction Details ---");
@@ -214,7 +214,7 @@ task("multisig:balance", "Check token balance")
     const [signer] = await hre.ethers.getSigners();
     const address = taskArgs.address || signer.address;
 
-    const Token = await hre.ethers.getContractFactory("GoofyGoober");
+    const Token = await hre.ethers.getContractFactory("DontPanic42");
     const token = Token.attach(contractAddress);
 
     console.log("\n--- Token Balance ---");
@@ -245,7 +245,7 @@ task("multisig:confirm-as", "Confirm a transaction using a specific private key"
     console.log("Using account:", signer.address);
     console.log("Transaction ID:", taskArgs.txid);
 
-    const Token = await hre.ethers.getContractFactory("GoofyGoober", signer);
+    const Token = await hre.ethers.getContractFactory("DontPanic42", signer);
     const token = Token.attach(contractAddress);
 
     // Check transaction status first
