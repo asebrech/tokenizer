@@ -28,6 +28,8 @@ async function main() {
   const tokenAddress = await token.getAddress();
 
   console.log("\n✅ Token deployed to:", tokenAddress);
+  console.log("\n🔍 View on Etherscan:");
+  console.log(`   https://sepolia.etherscan.io/address/${tokenAddress}`);
   console.log("\n📝 Update your .env file:");
   console.log(`CONTRACT_ADDRESS = "${tokenAddress}"`);
 
@@ -37,8 +39,6 @@ async function main() {
     "   npx hardhat multisig:submit --to <address> --amount <amount> --network sepolia"
   );
   console.log("\n2. Other owners confirm:");
-  console.log("   npx hardhat multisig:confirm --txid <id> --network sepolia");
-  console.log("   OR with specific key:");
   console.log(
     "   npx hardhat multisig:confirm-as --txid <id> --key <private_key> --network sepolia"
   );

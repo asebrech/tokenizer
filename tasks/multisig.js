@@ -20,11 +20,7 @@ task("multisig:info", "Display multisig contract information").setAction(
 
     console.log("Name:", name);
     console.log("Symbol:", symbol);
-    console.log(
-      "Total Supply:",
-      hre.ethers.formatEther(totalSupply),
-      symbol
-    );
+    console.log("Total Supply:", hre.ethers.formatEther(totalSupply), symbol);
     console.log("Required Signatures:", requiredSigs.toString());
     console.log("Total Transactions:", txCount.toString());
   }
@@ -80,14 +76,14 @@ task("multisig:submit", "Submit a new mint transaction")
     const receipt = await tx.wait();
 
     const txId = receipt.logs
-      .map(log => {
+      .map((log) => {
         try {
           return token.interface.parseLog(log);
         } catch (e) {
           return null;
         }
       })
-      .find(event => event && event.name === "TransactionSubmitted")
+      .find((event) => event && event.name === "TransactionSubmitted")
       ?.args?.txId;
 
     console.log("✓ Transaction submitted!");
@@ -102,70 +98,6 @@ task("multisig:submit", "Submit a new mint transaction")
     } else {
       console.log("⏳ Waiting for more signatures...");
       console.log("Confirmations:", txDetails.confirmationCount.toString());
-      const requiredSigs = await token.requiredSignatures();
-      console.log("Required:", requiredSigs.toString());
-    }
-  });
-
-task("multisig:confirm", "Confirm a pending transaction")
-  .addParam("txid", "The transaction ID to confirm")
-  .setAction(async (taskArgs, hre) => {
-    const contractAddress = process.env.CONTRACT_ADDRESS;
-    if (!contractAddress) {
-      console.error("Please set CONTRACT_ADDRESS in your .env file");
-      return;
-    }
-
-    const Token = await hre.ethers.getContractFactory("DontPanic42");
-    const token = Token.attach(contractAddress);
-
-    console.log("\n--- Confirming Transaction ---");
-    console.log("Transaction ID:", taskArgs.txid);
-
-    // Check transaction status first
-    const txDetails = await token.getTransaction(taskArgs.txid);
-    
-    if (txDetails.executed) {
-      console.log("❌ Transaction has already been executed");
-      console.log("Recipient:", txDetails.to);
-      console.log("Amount:", hre.ethers.formatEther(txDetails.amount), "tokens");
-      return;
-    }
-
-    // Check if already confirmed by this signer
-    const [signer] = await hre.ethers.getSigners();
-    const alreadyConfirmed = await token.isConfirmed(taskArgs.txid, signer.address);
-    
-    if (alreadyConfirmed) {
-      console.log("❌ You have already confirmed this transaction");
-      console.log("Current confirmations:", txDetails.confirmationCount.toString());
-      const requiredSigs = await token.requiredSignatures();
-      console.log("Required:", requiredSigs.toString());
-      return;
-    }
-
-    const tx = await token.confirmTransaction(taskArgs.txid);
-    const receipt = await tx.wait();
-
-    console.log("✓ Transaction confirmed!");
-    console.log("Gas used:", receipt.gasUsed.toString());
-
-    const executedEvent = receipt.logs
-      .map(log => {
-        try {
-          return token.interface.parseLog(log);
-        } catch (e) {
-          return null;
-        }
-      })
-      .find(event => event && event.name === "TransactionExecuted");
-    
-    if (executedEvent) {
-      console.log("✓ Transaction executed successfully!");
-    } else {
-      const updatedTxDetails = await token.getTransaction(taskArgs.txid);
-      console.log("⏳ Still needs more signatures");
-      console.log("Confirmations:", updatedTxDetails.confirmationCount.toString());
       const requiredSigs = await token.requiredSignatures();
       console.log("Required:", requiredSigs.toString());
     }
@@ -226,7 +158,10 @@ task("multisig:balance", "Check token balance")
     console.log("Balance:", hre.ethers.formatEther(balance), symbol);
   });
 
-task("multisig:confirm-as", "Confirm a transaction using a specific private key")
+task(
+  "multisig:confirm-as",
+  "Confirm a transaction using a specific private key"
+)
   .addParam("txid", "The transaction ID to confirm")
   .addParam("key", "The private key of the owner (without 0x prefix)")
   .setAction(async (taskArgs, hre) => {
@@ -237,7 +172,9 @@ task("multisig:confirm-as", "Confirm a transaction using a specific private key"
     }
 
     // Create a signer from the provided private key
-    const privateKey = taskArgs.key.startsWith('0x') ? taskArgs.key : `0x${taskArgs.key}`;
+    const privateKey = taskArgs.key.startsWith("0x")
+      ? taskArgs.key
+      : `0x${taskArgs.key}`;
     const provider = new hre.ethers.JsonRpcProvider(process.env.API_URL);
     const signer = new hre.ethers.Wallet(privateKey, provider);
 
@@ -250,20 +187,30 @@ task("multisig:confirm-as", "Confirm a transaction using a specific private key"
 
     // Check transaction status first
     const txDetails = await token.getTransaction(taskArgs.txid);
-    
+
     if (txDetails.executed) {
       console.log("❌ Transaction has already been executed");
       console.log("Recipient:", txDetails.to);
-      console.log("Amount:", hre.ethers.formatEther(txDetails.amount), "tokens");
+      console.log(
+        "Amount:",
+        hre.ethers.formatEther(txDetails.amount),
+        "tokens"
+      );
       return;
     }
 
     // Check if already confirmed by this signer
-    const alreadyConfirmed = await token.isConfirmed(taskArgs.txid, signer.address);
-    
+    const alreadyConfirmed = await token.isConfirmed(
+      taskArgs.txid,
+      signer.address
+    );
+
     if (alreadyConfirmed) {
       console.log("❌ This owner has already confirmed this transaction");
-      console.log("Current confirmations:", txDetails.confirmationCount.toString());
+      console.log(
+        "Current confirmations:",
+        txDetails.confirmationCount.toString()
+      );
       const requiredSigs = await token.requiredSignatures();
       console.log("Required:", requiredSigs.toString());
       return;
@@ -273,7 +220,9 @@ task("multisig:confirm-as", "Confirm a transaction using a specific private key"
     const isOwner = await token.isOwner(signer.address);
     if (!isOwner) {
       console.log("❌ This address is not an owner of the multisig");
-      console.log("Use 'npx hardhat multisig:owners --network sepolia' to see valid owners");
+      console.log(
+        "Use 'npx hardhat multisig:owners --network sepolia' to see valid owners"
+      );
       return;
     }
 
@@ -284,22 +233,25 @@ task("multisig:confirm-as", "Confirm a transaction using a specific private key"
     console.log("Gas used:", receipt.gasUsed.toString());
 
     const executedEvent = receipt.logs
-      .map(log => {
+      .map((log) => {
         try {
           return token.interface.parseLog(log);
         } catch (e) {
           return null;
         }
       })
-      .find(event => event && event.name === "TransactionExecuted");
-    
+      .find((event) => event && event.name === "TransactionExecuted");
+
     if (executedEvent) {
       console.log("✓ Transaction executed successfully!");
       console.log("🎉 Tokens have been minted!");
     } else {
       const updatedTxDetails = await token.getTransaction(taskArgs.txid);
       console.log("⏳ Still needs more signatures");
-      console.log("Confirmations:", updatedTxDetails.confirmationCount.toString());
+      console.log(
+        "Confirmations:",
+        updatedTxDetails.confirmationCount.toString()
+      );
       const requiredSigs = await token.requiredSignatures();
       console.log("Required:", requiredSigs.toString());
     }
