@@ -48,13 +48,8 @@ contract DontPanic42 is ERC20 {
         _;
     }
     
-    constructor(
-        string memory _name,
-        string memory _symbol,
-        address[] memory _owners, 
-        uint256 _requiredSignatures
-    ) 
-        ERC20(_name, _symbol) 
+    constructor(address[] memory _owners, uint256 _requiredSignatures) 
+        ERC20("DontPanic42", "PANIC") 
     {
         require(_owners.length > 0, "Owners required");
         require(

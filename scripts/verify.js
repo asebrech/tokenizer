@@ -10,9 +10,6 @@ async function main() {
 
   const [deployer] = await hre.ethers.getSigners();
 
-  const tokenName = process.env.TOKEN_NAME || "DontPanic42";
-  const tokenSymbol = process.env.TOKEN_SYMBOL || "PANIC";
-
   const owners = [
     deployer.address,
     "0x76FB103D48D7e2719FE2D4470337120498233218",
@@ -21,14 +18,12 @@ async function main() {
 
   console.log("Verifying contract:", contractAddress);
   console.log("Constructor args:");
-  console.log("  Token Name:", tokenName);
-  console.log("  Token Symbol:", tokenSymbol);
   console.log("  Owners:", owners);
   console.log("  Required signatures:", requiredSignatures);
 
   await hre.run("verify:verify", {
     address: contractAddress,
-    constructorArguments: [tokenName, tokenSymbol, owners, requiredSignatures],
+    constructorArguments: [owners, requiredSignatures],
   });
 }
 
