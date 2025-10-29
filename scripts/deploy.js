@@ -7,6 +7,9 @@ async function main() {
 
   console.log("Account balance:", ethers.formatEther(balance));
 
+  const tokenName = process.env.TOKEN_NAME || "DontPanic42";
+  const tokenSymbol = process.env.TOKEN_SYMBOL || "PANIC";
+
   // Define multisig owners
   const owners = [
     deployer.address,
@@ -15,13 +18,17 @@ async function main() {
 
   const requiredSignatures = owners.length;
 
+  console.log("\nToken Configuration:");
+  console.log("Name:", tokenName);
+  console.log("Symbol:", tokenSymbol);
+
   console.log("\nMultisig Configuration:");
   console.log("Owners:", owners);
   console.log("Required signatures:", requiredSignatures);
 
   // Deploy the contract with multisig parameters
   const Token = await ethers.getContractFactory("DontPanic42");
-  const token = await Token.deploy(owners, requiredSignatures);
+  const token = await Token.deploy(tokenName, tokenSymbol, owners, requiredSignatures);
 
   await token.waitForDeployment();
 

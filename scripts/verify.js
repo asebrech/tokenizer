@@ -8,24 +8,27 @@ async function main() {
     process.exit(1);
   }
 
-  // Get the deployer address dynamically
   const [deployer] = await hre.ethers.getSigners();
 
-  // These MUST match the values you used during deployment
+  const tokenName = process.env.TOKEN_NAME || "DontPanic42";
+  const tokenSymbol = process.env.TOKEN_SYMBOL || "PANIC";
+
   const owners = [
-    deployer.address, // First owner (deployer) - dynamically fetched
-    "0x76FB103D48D7e2719FE2D4470337120498233218", // Second owner
+    deployer.address,
+    "0x76FB103D48D7e2719FE2D4470337120498233218",
   ];
-  const requiredSignatures = owners.length; // All owners must sign
+  const requiredSignatures = owners.length;
 
   console.log("Verifying contract:", contractAddress);
   console.log("Constructor args:");
+  console.log("  Token Name:", tokenName);
+  console.log("  Token Symbol:", tokenSymbol);
   console.log("  Owners:", owners);
   console.log("  Required signatures:", requiredSignatures);
 
   await hre.run("verify:verify", {
     address: contractAddress,
-    constructorArguments: [owners, requiredSignatures],
+    constructorArguments: [tokenName, tokenSymbol, owners, requiredSignatures],
   });
 }
 
