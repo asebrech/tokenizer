@@ -23,11 +23,13 @@ DontPanic42
 ### State Variables
 
 #### Token Configuration
+
 ```solidity
 uint constant _initial_supply = 42000 * (10**18);  // 42,000 tokens
 ```
 
 #### Multisig Configuration
+
 ```solidity
 address[] public owners;                            // List of authorized owners
 mapping(address => bool) public isOwner;            // Quick owner lookup
@@ -35,6 +37,7 @@ uint256 public requiredSignatures;                  // Number of required approv
 ```
 
 #### Transaction Management
+
 ```solidity
 mapping(uint256 => Transaction) public transactions;           // Transaction storage
 mapping(uint256 => mapping(address => bool)) public confirmations;  // Confirmation tracking
@@ -63,10 +66,12 @@ constructor(address[] memory _owners, uint256 _requiredSignatures)
 **Purpose:** Initialize the token with multisig configuration
 
 **Parameters:**
+
 - `_owners`: Array of owner addresses
 - `_requiredSignatures`: Number of required approvals (must be ≤ number of owners)
 
 **Actions:**
+
 1. Validates owners (non-zero, unique addresses)
 2. Sets up multisig configuration
 3. Mints initial supply to deployer
@@ -75,9 +80,9 @@ constructor(address[] memory _owners, uint256 _requiredSignatures)
 ### submitMintTransaction
 
 ```solidity
-function submitMintTransaction(address to, uint256 amount) 
-    public 
-    onlyOwner 
+function submitMintTransaction(address to, uint256 amount)
+    public
+    onlyOwner
     returns (uint256)
 ```
 
@@ -86,6 +91,7 @@ function submitMintTransaction(address to, uint256 amount)
 **Access:** Only multisig owners
 
 **Process:**
+
 1. Validates recipient and amount
 2. Creates new transaction with unique ID
 3. Automatically confirms from submitter
@@ -110,6 +116,7 @@ function confirmTransaction(uint256 txId)
 **Access:** Only multisig owners who haven't confirmed yet
 
 **Process:**
+
 1. Validates transaction exists and is pending
 2. Records confirmation from caller
 3. Increments confirmation count
@@ -127,6 +134,7 @@ function executeTransaction(uint256 txId) internal
 **Access:** Internal only (called automatically)
 
 **Process:**
+
 1. Marks transaction as executed
 2. Mints tokens to recipient
 3. Emits `TransactionExecuted` event
@@ -136,27 +144,35 @@ function executeTransaction(uint256 txId) internal
 ### View Functions
 
 #### getOwners
+
 ```solidity
 function getOwners() public view returns (address[] memory)
 ```
+
 Returns array of all owner addresses.
 
 #### isConfirmed
+
 ```solidity
 function isConfirmed(uint256 txId, address owner) public view returns (bool)
 ```
+
 Checks if specific owner has confirmed a transaction.
 
 #### getTransaction
+
 ```solidity
 function getTransaction(uint256 txId) public view returns (...)
 ```
+
 Returns complete transaction details including confirmation count.
 
 #### getConfirmationCount
+
 ```solidity
 function getConfirmationCount(uint256 txId) public view returns (uint256)
 ```
+
 Returns number of confirmations for a transaction.
 
 ## Security Features
@@ -164,6 +180,7 @@ Returns number of confirmations for a transaction.
 ### Access Control
 
 **Modifiers:**
+
 - `onlyOwner`: Restricts functions to multisig owners only
 - `txExists`: Ensures transaction ID is valid
 - `notExecuted`: Prevents re-execution of completed transactions
@@ -172,11 +189,13 @@ Returns number of confirmations for a transaction.
 ### Validation Checks
 
 1. **Owner Validation:**
+
    - Non-zero addresses
    - Unique addresses (no duplicates)
    - At least one owner required
 
 2. **Signature Validation:**
+
    - Required signatures > 0
    - Required signatures ≤ total owners
    - Prevents impossible configurations
@@ -191,6 +210,7 @@ Returns number of confirmations for a transaction.
 ### Automatic Execution
 
 Transactions execute automatically when the confirmation threshold is reached, preventing:
+
 - Forgotten executions
 - Race conditions
 - Front-running attacks
@@ -198,6 +218,7 @@ Transactions execute automatically when the confirmation threshold is reached, p
 ## Events
 
 ### TransactionSubmitted
+
 ```solidity
 event TransactionSubmitted(
     uint256 indexed txId,
@@ -206,21 +227,26 @@ event TransactionSubmitted(
     uint256 amount
 );
 ```
+
 Emitted when a new mint proposal is created.
 
 ### TransactionConfirmed
+
 ```solidity
 event TransactionConfirmed(
     uint256 indexed txId,
     address indexed owner
 );
 ```
+
 Emitted when an owner confirms a transaction.
 
 ### TransactionExecuted
+
 ```solidity
 event TransactionExecuted(uint256 indexed txId);
 ```
+
 Emitted when a transaction is executed and tokens are minted.
 
 ## Gas Optimization
@@ -230,97 +256,10 @@ Emitted when a transaction is executed and tokens are minted.
 - Uses mappings for O(1) lookups
 - Minimal storage updates per transaction
 
-## Development Tools
-
-### Hardhat Configuration
-
-```javascript
-{
-  solidity: "0.8.28",
-  networks: {
-    sepolia: {
-      url: process.env.API_URL,
-      accounts: [process.env.PRIVATE_KEY]
-    }
-  },
-  paths: {
-    sources: "./code"  // Custom source directory
-  }
-}
-```
-
-### Custom Tasks
-
-Located in `tasks/multisig.js`:
-- Built on Hardhat task system
-- Uses ethers.js v6
-- Provides CLI interface to all contract functions
-- Includes error handling and user-friendly output
-
-### Dependencies
-
-```json
-{
-  "hardhat": "^2.26.3",
-  "@nomicfoundation/hardhat-toolbox": "^5.0.0",
-  "@openzeppelin/contracts": "^5.3.0",
-  "dotenv": "^17.0.1"
-}
-```
-
-## Testing Considerations
-
-### Unit Tests (Not Included)
-
-Recommended tests for production:
-- Owner validation during construction
-- Mint proposal submission
-- Confirmation flow
-- Automatic execution at threshold
-- Double-confirmation prevention
-- Invalid transaction ID handling
-- Standard ERC20 functionality
-
-### Manual Testing
-
-Performed on Sepolia testnet:
-- ✅ Deployment with multiple owners
-- ✅ Token transfer functionality
-- ✅ Multisig proposal submission
-- ✅ Multi-party confirmation
-- ✅ Automatic execution
-- ✅ Etherscan verification
-
-## Upgrade Path
-
-Current implementation is **not upgradeable**. For upgradeable version:
-
-1. Use OpenZeppelin's Upgradeable contracts
-2. Implement proxy pattern (UUPS or Transparent)
-3. Add upgrade authorization to multisig
-4. Consider storage gaps for future upgrades
-
-## Known Limitations
-
-1. **Fixed Owner Set**: Cannot add/remove owners after deployment
-2. **Fixed Threshold**: Cannot change required signatures after deployment
-3. **Mint Only**: Multisig only controls minting, not other operations
-4. **No Burn**: No mechanism to reduce total supply
-5. **Gas Costs**: Multiple confirmations required, increasing total gas cost
-
-## Future Enhancements
-
-Potential improvements (not implemented):
-- Dynamic owner management
-- Configurable signature threshold
-- Transaction expiration/cancellation
-- Multiple permission levels
-- Multisig control over transfers
-- Emergency pause functionality
-
 ## Contract Verification
 
 Verified on Sepolia Etherscan:
+
 - **Address**: `0xD1D920D8A8BA0F148e46fdbB7271Cfc9aA8e230a`
 - **Network**: Sepolia Testnet
 - **Compiler**: Solidity 0.8.28

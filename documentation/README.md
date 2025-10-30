@@ -5,6 +5,7 @@ Welcome to the DontPanic42 token documentation. This folder contains all the inf
 ## 📚 Documentation Files
 
 ### [DEPLOYMENT.md](DEPLOYMENT.md)
+
 **Complete deployment guide** with step-by-step instructions.
 
 - Prerequisites and setup
@@ -16,24 +17,24 @@ Welcome to the DontPanic42 token documentation. This folder contains all the inf
 👉 **Start here if you want to deploy your own instance**
 
 ### [USAGE.md](USAGE.md)
+
 **How to interact** with the deployed token.
 
 - Standard ERC20 operations
 - Multisig minting workflow
 - Available Hardhat tasks
 - MetaMask integration
-- Security best practices
 
 👉 **Start here if you want to use the token**
 
 ### [TECHNICAL.md](TECHNICAL.md)
+
 **Technical architecture and implementation details**.
 
 - Smart contract structure
 - Function documentation
 - Security features
 - Events and modifiers
-- Development tools
 
 👉 **Start here if you want to understand the code**
 
@@ -51,19 +52,6 @@ npx hardhat multisig:owners --network sepolia
 # View on Etherscan
 open https://sepolia.etherscan.io/address/0xD1D920D8A8BA0F148e46fdbB7271Cfc9aA8e230a
 ```
-
-### Want to Deploy Your Own?
-
-1. Read [DEPLOYMENT.md](DEPLOYMENT.md)
-2. Set up your environment
-3. Run deployment script
-4. Follow [USAGE.md](USAGE.md) to test
-
-### Want to Understand How It Works?
-
-1. Read [TECHNICAL.md](TECHNICAL.md)
-2. Review `code/Token.sol`
-3. Examine `tasks/multisig.js`
 
 ## 🎯 Key Features
 
@@ -86,14 +74,6 @@ This project implements multisignature functionality to ensure that no single pa
 - **Network**: Sepolia Testnet
 - **Address**: `0xD1D920D8A8BA0F148e46fdbB7271Cfc9aA8e230a`
 - **Explorer**: [View on Etherscan](https://sepolia.etherscan.io/address/0xD1D920D8A8BA0F148e46fdbB7271Cfc9aA8e230a)
-
-## 📞 Need Help?
-
-If something is unclear:
-1. Check the relevant documentation file
-2. Review the troubleshooting section in [DEPLOYMENT.md](DEPLOYMENT.md)
-3. Examine the code comments in `code/Token.sol`
-4. Look at the task implementations in `tasks/multisig.js`
 
 ## 📖 Additional Resources
 

@@ -17,6 +17,7 @@ npx hardhat multisig:info --network sepolia
 ```
 
 Output:
+
 ```
 --- Contract Information ---
 Name: DontPanic42
@@ -33,6 +34,7 @@ npx hardhat multisig:owners --network sepolia
 ```
 
 Output:
+
 ```
 --- Multisig Owners ---
 Required Signatures: 2 out of 2
@@ -49,6 +51,7 @@ npx hardhat multisig:balance --address 0xYourAddress --network sepolia
 ```
 
 Output:
+
 ```
 --- Token Balance ---
 Address: 0xYourAddress
@@ -71,6 +74,7 @@ npx hardhat multisig:submit \
 ```
 
 Output:
+
 ```
 --- Submitting Mint Transaction ---
 Recipient: 0xRecipientAddress
@@ -84,6 +88,7 @@ Required: 2
 ```
 
 **What happens:**
+
 - A new transaction proposal is created
 - The submitter automatically confirms it
 - Transaction gets a unique ID (starting from 0)
@@ -103,6 +108,7 @@ npx hardhat multisig:confirm-as \
 **Security Note:** Never share private keys. Each owner should run this command with their own key.
 
 Output after final confirmation:
+
 ```
 --- Confirming Transaction ---
 Transaction ID: 0
@@ -117,6 +123,7 @@ New Total Supply: 42100 PANIC
 ```
 
 **What happens:**
+
 - Owner confirms the transaction
 - When threshold is reached (all owners confirmed), it auto-executes
 - Tokens are minted to the recipient
@@ -131,6 +138,7 @@ npx hardhat multisig:tx --txid 0 --network sepolia
 ```
 
 Output:
+
 ```
 --- Transaction Details ---
 Transaction ID: 0
@@ -177,6 +185,7 @@ You can also interact with the token using MetaMask:
 ### Transfer Tokens
 
 Once added, you can:
+
 - View your PANIC token balance
 - Send tokens to other addresses
 - See transaction history
@@ -185,54 +194,30 @@ Once added, you can:
 
 ## Available Hardhat Tasks
 
-| Task | Description |
-|------|-------------|
-| `multisig:info` | Display contract information (name, symbol, supply, etc.) |
-| `multisig:owners` | List all multisig owners and signature requirements |
-| `multisig:submit` | Submit a new mint transaction proposal |
-| `multisig:confirm-as` | Confirm a transaction with a specific private key |
-| `multisig:tx` | View detailed information about a transaction |
-| `multisig:balance` | Check PANIC token balance of an address |
+| Task                  | Description                                               |
+| --------------------- | --------------------------------------------------------- |
+| `multisig:info`       | Display contract information (name, symbol, supply, etc.) |
+| `multisig:owners`     | List all multisig owners and signature requirements       |
+| `multisig:submit`     | Submit a new mint transaction proposal                    |
+| `multisig:confirm-as` | Confirm a transaction with a specific private key         |
+| `multisig:tx`         | View detailed information about a transaction             |
+| `multisig:balance`    | Check PANIC token balance of an address                   |
 
 All tasks support the `--network sepolia` flag.
 
 ## Security Best Practices
 
 ### For Token Holders
+
 - ✅ Verify the contract address before adding to wallet
 - ✅ Only interact with the official contract
 - ✅ Double-check recipient addresses before transfers
 
 ### For Multisig Owners
+
 - ✅ Keep private keys secure and offline when possible
 - ✅ Verify transaction details before confirming
 - ✅ Never share your private key with anyone
 - ✅ Use hardware wallets for production deployments
 - ❌ Never confirm transactions you didn't review
 - ❌ Never run commands from untrusted sources
-
-## Common Issues
-
-### Transaction Already Confirmed
-If you see "You have already confirmed this transaction":
-- You cannot confirm the same transaction twice
-- Wait for other owners to confirm
-- Use `multisig:tx` to check current status
-
-### Transaction Already Executed
-If transaction is already executed:
-- The minting already completed successfully
-- Use `multisig:info` to verify new total supply
-- Use `multisig:balance` to check recipient's balance
-
-### Invalid Transaction ID
-If "Transaction does not exist":
-- Verify the transaction ID is correct
-- Transaction IDs start from 0
-- Use `multisig:info` to see total transaction count
-
-## Next Steps
-
-- Read [TECHNICAL.md](TECHNICAL.md) for architecture details
-- Explore the contract on [Sepolia Etherscan](https://sepolia.etherscan.io/address/0xD1D920D8A8BA0F148e46fdbB7271Cfc9aA8e230a)
-- Review the source code in `code/Token.sol`

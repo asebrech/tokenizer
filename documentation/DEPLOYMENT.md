@@ -13,6 +13,7 @@ npm install
 ### 2. Get Sepolia ETH
 
 You need Sepolia testnet ETH to deploy the contract. Get free testnet ETH from:
+
 - [Sepolia Faucet](https://sepoliafaucet.com/)
 - [Alchemy Sepolia Faucet](https://sepoliafaucet.com/)
 
@@ -33,6 +34,7 @@ ETHERSCAN_API_KEY="your_etherscan_api_key"
 ```
 
 **Important Security Notes:**
+
 - Never commit your `.env` file to version control (it's already in `.gitignore`)
 - Never share your private key
 - Use a testnet wallet, not your main wallet
@@ -40,12 +42,14 @@ ETHERSCAN_API_KEY="your_etherscan_api_key"
 ### 4. Get API Keys
 
 **Alchemy (RPC Provider)**
+
 1. Go to [alchemy.com](https://www.alchemy.com/)
 2. Create a free account
 3. Create a new app on Sepolia network
 4. Copy the HTTP URL to `API_URL` in `.env`
 
 **Etherscan (for verification)**
+
 1. Go to [etherscan.io](https://etherscan.io/)
 2. Create an account
 3. Navigate to API Keys section
@@ -60,8 +64,8 @@ Edit `deployment/deploy.js` to set your multisig owners:
 
 ```javascript
 const owners = [
-    deployer.address,                              // First owner (deployer)
-    "0x76FB103D48D7e2719FE2D4470337120498233218", // Second owner
+  deployer.address, // First owner (deployer)
+  "0x76FB103D48D7e2719FE2D4470337120498233218", // Second owner
 ];
 ```
 
@@ -78,6 +82,7 @@ npx hardhat compile
 ```
 
 Expected output:
+
 ```
 Compiled 1 Solidity file successfully
 ```
@@ -89,6 +94,7 @@ npx hardhat run deployment/deploy.js --network sepolia
 ```
 
 Expected output:
+
 ```
 Deploying contracts with the account: 0x...
 Account balance: 0.5 ETH
@@ -127,23 +133,9 @@ This makes your contract source code publicly viewable and verifiable on Ethersc
 ## Troubleshooting
 
 ### Insufficient Funds Error
+
 - Make sure you have enough Sepolia ETH (at least 0.01 ETH recommended)
 - Get more from faucets listed above
-
-### Network Connection Error
-- Check your `API_URL` is correct
-- Verify your internet connection
-- Try using a different RPC provider
-
-### Invalid Private Key
-- Ensure private key is in your `.env` file
-- Remove any `0x` prefix from the private key
-- Make sure there are no quotes or spaces
-
-### Verification Failed
-- Wait a few minutes after deployment
-- Ensure `CONTRACT_ADDRESS` in `.env` is correct
-- Check that your `ETHERSCAN_API_KEY` is valid
 
 ## Post-Deployment
 
